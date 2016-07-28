@@ -3,8 +3,10 @@
 import { combineReducers } from 'redux';
 import PlanetReducer from './PlanetReducer';
 import LordsReducer from './LordsReducer';
+import ScrollReducer from './ScrollReducer';
 
 export default combineReducers({
 	planetInfo: PlanetReducer,
-	lords: LordsReducer
+	lordsInfo: LordsReducer,
+	scroll: ScrollReducer
 });

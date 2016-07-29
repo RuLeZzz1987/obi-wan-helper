@@ -2,35 +2,34 @@
 
 import React, { PropTypes, Component } from "react";
 import { connect } from "react-redux";
-import * as Actions from "../actions/ScrollActions";
-import { bindActionCreators } from 'redux';
+import { scrollDown, scrollUp } from "../actions/index";
 
 class Navigation extends Component {
 
 	static propTypes = {
-		action: PropTypes.shape({
-			scrollUp: PropTypes.func.isRequired,
-			scrollDown: PropTypes.func.isRequired
-		}).isRequired,
+		scrollUp: PropTypes.func.isRequired,
+		scrollDown: PropTypes.func.isRequired,
 		up: PropTypes.bool.isRequired,
 		down: PropTypes.bool.isRequired
 	};
 
 	render() {
-		let upBtnClasses = `css-button-up ${this.props.up ? 'css-button-disabled': ''}`;
-		let downBtnClasses = `css-button-down ${this.props.down ? 'css-button-disabled': ''}`;
-		
+		let upBtnClasses = `css-button-up ${this.props.up ? 'css-button-disabled' : ''}`;
+		let downBtnClasses = `css-button-down ${this.props.down ? 'css-button-disabled' : ''}`;
+
+		console.log(this.props.up, this.props.down);
+
 		return (
 			<aside className="css-scroll-buttons">
 				<button
 					disabled={this.props.up}
 					className={upBtnClasses}
-					onClick={this.props.action.scrollUp}
+					onClick={this.props.scrollUp}
 				/>
 				<button
 					disabled={this.props.down}
 					className={downBtnClasses}
-					onclick={this.props.action.scrollDown}
+					onClick={this.props.scrollDown}
 				/>
 			</aside>
 		)
@@ -38,12 +37,13 @@ class Navigation extends Component {
 }
 
 const mapStateToProps = state => ({
-	up: state.scroll.up,
-	down: state.scroll.down
+	up: state.lordsInfo.scrollable.up,
+	down: state.lordsInfo.scrollable.down
 });
 
 const mapDispatchToProps = dispatch => ({
-	action: bindActionCreators(Actions, dispatch)
+	scrollDown: () => dispatch(scrollDown()),
+	scrollUp: () => dispatch(scrollUp())
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Navigation);

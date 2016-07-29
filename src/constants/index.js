@@ -10,6 +10,14 @@ export const SCROLL_UP = 'SCROLL_UP';
 
 export const SCROLL_DOWN = 'SCROLL_DOWN';
 
-export const TOGGLE_DOWN = 'TOGGLE_DOWN';
+export const TOGGLE_SCROLLED_DOWN = 'TOGGLE_SCROLLED_DOWN';
 
-export const TOGGLE_UP = 'TOGGLE_UP';
+export const TOGGLE_SCROLLED_UP = 'TOGGLE_SCROLLED_UP';
+
+export const OFF_DOWN = 'OFF_DOWN';
+
+export const ON_DOWN = 'ON_DOWN';
+
+export const OFF_UP = 'OFF_UP';
+
+export const ON_UP = 'OFF_UP';

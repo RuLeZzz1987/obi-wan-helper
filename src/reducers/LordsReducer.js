@@ -3,7 +3,8 @@
 import * as Constants from "../constants/index";
 
 const defaultState = {
-	lords: new Array(5),
+	urls: ['http://jedi.smartjs.academy/dark-jedis/3616', ...new Array(4)],
+	lords: {},
 	scrollable: {
 		up: false,
 		down: false
@@ -20,40 +21,107 @@ export default (state = defaultState, action) => {
 			return { ...state, scrollable: { ...state.scrollable, down: false } };
 		case Constants.OFF_UP:
 			return { ...state, scrollable: { ...state.scrollable, up: true } };
-		case Constants.TOGGLE_SCROLLED_DOWN: 
-			return {...state, scrolledDown: false };
+		case Constants.TOGGLE_SCROLLED_DOWN:
+			return { ...state, scrolledDown: false };
 		case Constants.TOGGLE_SCROLLED_UP:
-			return {...state, scrolledUp: false };
+			return { ...state, scrolledUp: false };
 		case Constants.ON_UP:
 			return { ...state, scrollable: { ...state.scrollable, up: false } };
 		case Constants.SCROLL_UP:
 		{
-			const nextLords = [...new Array(2), ...state.lords.slice(0, 3)];
-			state.lords
-				 .slice(3, 5)
-				 .forEach(lord=>lord instanceof Promise ? lord.abort() : null);
-			return { ...state, lords: nextLords, scrolledUp: true }
+			const nextUrls = [...new Array(2), ...state.urls.slice(0, 3)];
+			let lord = state.lords[state.urls[0]];
+			let idx = nextUrls.indexOf(state.urls[0]);
+			if (!nextUrls[idx + 1] && lord) {
+				nextUrls[idx + 1] = lord.apprentice.url;
+			}
+			if (!nextUrls[idx - 1] && lord) {
+				nextUrls[idx - 1] = lord.master.url;
+			}
+			return {
+				...state,
+				lords: state.urls.reduce((lords, url)=> {
+					if (nextUrls.indexOf(url) != -1) {
+						lords[url] = state.lords[url];
+					} else {
+						if (state.lords[url] instanceof Promise) {
+							state.lords[url].abort();
+						}
+					}
+					return lords;
+				}, {}),
+				urls: nextUrls,
+				scrolledDown: true,
+				scrollable: {
+					up: state.scrollable.up,
+					down: nextUrls.reduce((count, el)=>(!!el ? ++count : count), 0) == 0
+				}
+			}
+
 		}
 		case Constants.SCROLL_DOWN:
 		{
-			const nextLords = [...state.lords.slice(2, 5), ...new Array(2)];
-			state.lords
-				 .slice(0, 2)
-				 .forEach(lord=>lord instanceof Promise ? lord.abort() : null);
-			return { ...state, lords: nextLords, scrolledDown: true }
+			const nextUrls = [...state.urls.slice(2, 5), ...new Array(2)];
+			let lord = state.lords[state.urls[2]];
+			let idx = nextUrls.indexOf(state.urls[2]);
+			if (!nextUrls[idx + 1] && lord) {
+				nextUrls[idx + 1] = lord.apprentice.url;
+			}
+			if (!nextUrls[idx - 1] && lord) {
+				nextUrls[idx - 1] = lord.master.url;
+			}
+			return {
+				...state,
+				lords: state.urls.reduce((lords, url)=> {
+					if (nextUrls.indexOf(url) != -1) {
+						lords[url] = state.lords[url];
+					} else {
+						if (state.lords[url] instanceof Promise) {
+							state.lords[url].abort();
+						}
+					}
+					return lords;
+				}, {}),
+				urls: nextUrls,
+				scrolledDown: true,
+				scrollable: {
+					up: state.scrollable.up,
+					down: nextUrls.reduce((count, el)=>(!!el ? ++count : count), 0) == 0
+				}
+			}
 		}
 		case Constants.ADD_LORD_DOWN:
 		{
-			const nextLords = [...state.lords];
-			nextLords[action.position] = action.lord;
-			return {
-				...state,
-				lords: nextLords,
-				scrollable: {
-					down: !(action.lord instanceof Promise) ?  !action.lord.apprentice.url : state.scrollable.down,
-					up: state.scrollable.up
+			if (!action.lord) {
+				return state;
+			}
+			if (action.lord instanceof Promise) {
+				return {
+					...state,
+					lords: {
+						...state.lords,
+						[action.url]: action.lord
+					}
 				}
-			};
+			}
+			else {
+				const nextUrls = [...state.urls];
+				const idx = nextUrls.indexOf(action.url);
+				if (!nextUrls[idx - 1]) {
+					nextUrls[idx - 1] = action.lord.master.url;
+				}
+				if (!nextUrls[idx + 1]) {
+					nextUrls[idx + 1] = action.lord.apprentice.url;
+				}
+				return {
+					...state,
+					lords: {
+						...state.lords,
+						[action.url]: action.lord
+					},
+					urls: nextUrls
+				}
+			}
 		}
 		default:
 			return state;

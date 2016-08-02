@@ -16,9 +16,7 @@ class Navigation extends Component {
 	render() {
 		let upBtnClasses = `css-button-up ${this.props.up ? 'css-button-disabled' : ''}`;
 		let downBtnClasses = `css-button-down ${this.props.down ? 'css-button-disabled' : ''}`;
-
-		console.log(this.props.up, this.props.down);
-
+		
 		return (
 			<aside className="css-scroll-buttons">
 				<button
